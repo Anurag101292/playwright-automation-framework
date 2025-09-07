@@ -1,0 +1,11 @@
+{
+  "flights": [
+    {
+      "flightNo": "AI-101",
+      "from": "Bangalore",
+      "to": "London",
+      "price": 45000,
+      "date": "2025-12-01"
+    }
+  ]
+}

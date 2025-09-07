@@ -1,24 +1,25 @@
 package com.framework.base;
-
 import com.microsoft.playwright.*;
 public class DriverManager {
-    private static ThreadLocal<BrowserContext> context = new ThreadLocal<>();
-    private static ThreadLocal<Page> page = new ThreadLocal<>();
-
-    public static void initBrowser(String browserName) {
+    private static ThreadLocal<Playwright> tlPlaywright = new ThreadLocal<>();
+    private static ThreadLocal<Browser> tlBrowser = new ThreadLocal<>();
+    private static ThreadLocal<BrowserContext> tlContext = new ThreadLocal<>();
+    private static ThreadLocal<Page> tlPage = new ThreadLocal<>();
+    public static void init(String browserName, boolean headless) {
         Playwright playwright = Playwright.create();
-        Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
+        tlPlaywright.set(playwright);
+        Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(headless));
+        tlBrowser.set(browser);
         BrowserContext ctx = browser.newContext();
-        Page pg = ctx.newPage();
-        context.set(ctx);
-        page.set(pg);
+        tlContext.set(ctx);
+        tlPage.set(ctx.newPage());
+        String base = ConfigManager.get("baseUrl"); if (base != null) tlPage.get().navigate(base);
     }
-
-    public static Page getPage() {
-        return page.get();
-    }
-
-    public static void close() {
-        context.get().close();
+    public static Page getPage() { return tlPage.get(); }
+    public static void quit() {
+        if (tlContext.get() != null) tlContext.get().close();
+        if (tlBrowser.get() != null) tlBrowser.get().close();
+        if (tlPlaywright.get() != null) tlPlaywright.get().close();
+        tlPage.remove(); tlContext.remove(); tlBrowser.remove(); tlPlaywright.remove();
     }
 }

@@ -1,0 +1,6 @@
+{
+  "fromInput": "#fromCity",
+  "toInput": "#toCity",
+  "dateInput": "#departDate",
+  "searchBtn": "#searchBtn"
+}
