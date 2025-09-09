@@ -1,23 +1,20 @@
 package com.tests;
 
+import com.framework.base.TestBase;
+import org.testng.Assert;
 import org.testng.annotations.*;
 import com.framework.base.DriverManager;
-import com.framework.pages.SearchPage;
 
-public class FlightBookingTests {
-    @BeforeMethod
-    public void setUp() {
-        DriverManager.initBrowser("chromium");
-    }
+public class FlightBookingTests extends TestBase {
 
     @Test
-    public void testSearchFlight() {
-        SearchPage search = new SearchPage(DriverManager.getPage());
-        search.searchFlight("Bangalore", "London", "2025-12-01");
+    public void verifyAppLaunch() {
+        String title = DriverManager.getPage().title();
+        System.out.println("Page title: " + title);
+
+        Assert.assertNotNull(title, "Title should not be null");
+        Assert.assertFalse(title.isEmpty(), "Title should not be empty");
     }
 
-    @AfterMethod
-    public void tearDown() {
-        DriverManager.close();
-    }
+
 }

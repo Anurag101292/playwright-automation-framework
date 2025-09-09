@@ -1,0 +1,10 @@
+{
+  "flightMocks": [
+    {
+      "from": "Bangalore",
+      "to": "London",
+      "date": "2025-12-01",
+      "mockFile": "src/main/resources/mocks/blrlhr.json"
+    }
+  ]
+}

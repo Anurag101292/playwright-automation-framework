@@ -1,7 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
-<suite name="PlaywrightAutomationSuite" parallel="tests" thread-count="10">
-    <test name="FlightBookingTests">
+<suite name="AutomationSuite" parallel="false">
+
+    <parameter name="ENV" value="PROD"/>
+    <parameter name="browser" value="chromium"/>
+    <parameter name="headless" value="false"/>
+    <parameter name="ENABLE_MOCKS" value="false"/>
+
+    <test name="SampleTests">
         <classes>
             <class name="com.tests.FlightBookingTests"/>
         </classes>
