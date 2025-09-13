@@ -1,68 +1,41 @@
 package com.framework.base;
 
-import com.microsoft.playwright.*;
+import com.framework.factory.BrowserStrategy;
+import com.framework.factory.BrowserFactory;
+import com.microsoft.playwright.Page;
 
 public class DriverManager {
 
-    private static ThreadLocal<Playwright> playwright = new ThreadLocal<>();
-    private static ThreadLocal<Browser> browser = new ThreadLocal<>();
-    private static ThreadLocal<BrowserContext> context = new ThreadLocal<>();
-    private static ThreadLocal<Page> page = new ThreadLocal<>();
+    // Thread-safe Page for parallel execution in TestNG
+    private static ThreadLocal<Page> pageThreadLocal = new ThreadLocal<>();
 
-    // init driver
+    /**
+     * Initialize browser using Strategy + Factory pattern
+     * Called from TestBase @BeforeMethod
+     */
     public static void init(String browserName, boolean headless) {
-        playwright.set(Playwright.create());
-
-        BrowserType.LaunchOptions options = new BrowserType.LaunchOptions().setHeadless(headless);
-
-        switch (browserName.toLowerCase()) {
-            case "chromium":
-                browser.set(playwright.get().chromium().launch(options));
-                break;
-            case "firefox":
-                browser.set(playwright.get().firefox().launch(options));
-                break;
-            case "webkit":
-                browser.set(playwright.get().webkit().launch(options));
-                break;
-            default:
-                throw new RuntimeException("Unsupported browser: " + browserName);
-        }
-
-        context.set(browser.get().newContext());
-        page.set(context.get().newPage());
+        BrowserStrategy strategy = BrowserFactory.getStrategy(browserName);
+        Page page = strategy.createDriver(headless);
+        pageThreadLocal.set(page);
+        System.out.println(">>> [DriverManager] Initialized browser: " + browserName + " | Headless: " + headless);
     }
 
+    /**
+     * Get the Page instance for the current test thread
+     */
     public static Page getPage() {
-        return page.get();
+        return pageThreadLocal.get();
     }
 
-    public static BrowserContext getContext() {
-        return context.get();
-    }
-
-    public static Browser getBrowser() {
-        return browser.get();
-    }
-
-    // ✅ quit / close everything
+    /**
+     * Cleanup browser after each test
+     */
     public static void quit() {
-        try {
-            if (context.get() != null) {
-                context.get().close();
-                context.remove();
-            }
-            if (browser.get() != null) {
-                browser.get().close();
-                browser.remove();
-            }
-            if (playwright.get() != null) {
-                playwright.get().close();
-                playwright.remove();
-            }
-            page.remove();
-        } catch (Exception e) {
-            System.err.println("⚠️ Error closing Playwright: " + e.getMessage());
+        Page page = pageThreadLocal.get();
+        if (page != null) {
+            page.context().browser().close();
+            pageThreadLocal.remove();
+            System.out.println(">>> [DriverManager] Browser closed and cleaned up.");
         }
     }
 }
