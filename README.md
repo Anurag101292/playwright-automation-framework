@@ -183,3 +183,112 @@ Listeners capture results, logs, screenshots.
 ✅ Maintainable: Any change in UI or infrastructure requires minimal updates.
 
 
+For Modular 
+automation-framework/
+│
+├── config/
+│   ├── config-sit.properties
+│   ├── config-uat.properties
+│   └── config-prod.properties
+│
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   ├── base/
+│   │   │   │   ├── BaseTest.java
+│   │   │   │   ├── BaseApiTest.java
+│   │   │   │   └── ApiClient.java
+│   │   │   │
+│   │   │   ├── api/
+│   │   │   │   ├── auth/
+│   │   │   │   │   └── OAuth2TokenManager.java
+│   │   │   │   ├── clients/
+│   │   │   │   │   ├── LoginApi.java
+│   │   │   │   │   ├── SearchApi.java
+│   │   │   │   │   └── BookingApi.java
+│   │   │   │   ├── models/
+│   │   │   │   │   ├── request/
+│   │   │   │   │   │   ├── LoginRequest.java
+│   │   │   │   │   │   ├── SearchRequest.java
+│   │   │   │   │   │   └── BookingRequest.java
+│   │   │   │   │   └── response/
+│   │   │   │   │       ├── LoginResponse.java
+│   │   │   │   │       ├── SearchResponse.java
+│   │   │   │   │       └── BookingResponse.java
+│   │   │   │
+│   │   │   ├── ui/
+│   │   │   │   ├── pages/
+│   │   │   │   │   ├── LoginPage.java
+│   │   │   │   │   ├── SearchPage.java
+│   │   │   │   │   ├── BlotterPage.java
+│   │   │   │   │   ├── PassengerPage.java
+│   │   │   │   │   └── BookingPage.java
+│   │   │   │   └── components/
+│   │   │   │       └── CommonUIActions.java
+│   │   │   │
+│   │   │   ├── utils/
+│   │   │   │   ├── ConfigManager.java
+│   │   │   │   ├── TestDataLoader.java
+│   │   │   │   ├── JsonUtils.java
+│   │   │   │   ├── LoggerUtil.java
+│   │   │   │   ├── RetryAnalyzer.java
+│   │   │   │   └── ApiAssertions.java
+│   │   │   │
+│   │   │   └── reporting/
+│   │   │       ├── ExtentReportManager.java
+│   │   │       └── AllureReportListener.java
+│   │   │
+│   │   └── resources/
+│   │       ├── testdata/
+│   │       │   ├── loginTestData.json
+│   │       │   └── bookingTestData.json
+│   │       └── payloads/
+│   │           ├── LoginPayload.json
+│   │           └── BookingPayload.json
+│   │
+│   └── test/
+│       └── java/
+│           ├── api/
+│           │   ├── LoginApiTest.java
+│           │   ├── SearchApiTest.java
+│           │   └── BookingApiTest.java
+│           └── ui/
+│               ├── LoginUITest.java
+│               ├── SearchUITest.java
+│               └── BookingUITest.java
+│
+└── pom.xml
+
+
+                ┌─────────────────────────┐
+                │       BaseTest          │
+                │  - setup(), teardown()  │
+                └──────────┬──────────────┘
+                           │
+         ┌─────────────────┴─────────────────┐
+         │                                   │
+┌───────────────────────┐        ┌───────────────────────┐
+│     BaseApiTest       │        │     ApiClient         │
+│ - setupApi()          │        │ - get(), post(), put()│
+└──────────┬────────────┘        └──────────┬────────────┘
+           │                                 │
+           │                                 │
+   ┌───────┴───────────┐                     │
+   │ OAuth2TokenManager │                     │
+   │ - getAccessToken() │                     │
+   └────────────────────┘                     │
+                                              │
+                            ┌─────────────────┴───────────────────┐
+                            │             Clients                 │
+                            │  (LoginApi, SearchApi, BookingApi) │
+                            └─────────────────┬───────────────────┘
+                                              │
+                      ┌───────────────────────┴──────────────────────┐
+                      │                   Models                     │
+                      │    Request + Response DTOs (POJOs)           │
+                      └───────────────────────┬──────────────────────┘
+                                              │
+                      ┌───────────────────────┴──────────────────────┐
+                      │                   Utils                      │
+                      │  (JsonUtils, ConfigManager, Assertions etc.) │
+                      └──────────────────────────────────────────────┘
